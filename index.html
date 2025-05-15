@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechXpress - E-Commerce Platform</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <h1>TechXpress</h1>
+            </div>
+            <nav>
+                <ul id="nav-menu">
+                    <li><a href="#" class="active" data-page="home">Home</a></li>
+                    <li><a href="#" data-page="products">Products</a></li>
+                    <li><a href="#" data-page="categories">Categories</a></li>
+                    <li id="cart-link"><a href="#" data-page="cart"><i class="fas fa-shopping-cart"></i> Cart</a></li>
+                </ul>
+            </nav>
+            <div class="user-panel">
+                <div id="logged-out-state">
+                    <button id="login-btn">Login</button>
+                    <button id="register-btn">Register</button>
+                </div>
+                <div id="logged-in-state" style="display: none;">
+                    <span id="username">User</span>
+                    <button id="logout-btn">Logout</button>
+                </div>
+            </div>
+            <div class="mobile-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </header>
+
+        <main>
+            <!-- Home Page -->
+            <section id="home" class="page active">
+                <div class="hero">
+                    <div class="hero-content">
+                        <h2>Welcome to TechXpress</h2>
+                        <p>Your one-stop shop for all your tech needs</p>
+                        <button class="shop-now-btn" data-page="products">Shop Now</button>
+                    </div>
+                </div>
+                
+                <div class="featured-products">
+                    <h2>Featured Products</h2>
+                    <div id="featured-products-grid" class="products-grid">
+                        <!-- Products will be loaded here -->
+                        <div class="loading">Loading products...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Products Page -->
+            <section id="products" class="page">
+                <h2>All Products</h2>
+                <div class="filters">
+                    <select id="category-filter">
+                        <option value="">All Categories</option>
+                        <!-- Categories will be loaded here -->
+                    </select>
+                    <input type="text" id="search-input" placeholder="Search products...">
+                </div>
+                <div id="admin-actions" class="admin-only" style="display: none;">
+                    <button id="add-product-btn" class="action-btn">Add New Product</button>
+                </div>
+                <div id="products-grid" class="products-grid">
+                    <!-- Products will be loaded here -->
+                    <div class="loading">Loading products...</div>
+                </div>
+            </section>
+
+            <!-- Categories Page -->
+            <section id="categories" class="page">
+                <h2>Product Categories</h2>
+                <div id="admin-category-actions" class="admin-only" style="display: none;">
+                    <button id="add-category-btn" class="action-btn">Add New Category</button>
+                </div>
+                <div id="categories-grid" class="categories-grid">
+                    <!-- Categories will be loaded here -->
+                    <div class="loading">Loading categories...</div>
+                </div>
+            </section>
+
+            <!-- Cart Page -->
+            <section id="cart" class="page">
+                <h2>Your Shopping Cart</h2>
+                <div id="cart-items">
+                    <!-- Cart items will be loaded here -->
+                    <p class="empty-cart">Your cart is empty.</p>
+                </div>
+                <div class="cart-summary">
+                    <div class="subtotal">
+                        <span>Subtotal:</span>
+                        <span id="cart-subtotal">$0.00</span>
+                    </div>
+                    <button id="checkout-btn" class="action-btn" disabled>Proceed to Checkout</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Auth Forms -->
+        <div id="auth-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                
+                <!-- Login Form -->
+                <div id="login-form" class="auth-form">
+                    <h2>Login</h2>
+                    <form id="login-form-element">
+                        <div class="form-group">
+                            <label for="login-email">Email</label>
+                            <input type="email" id="login-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" required>
+                        </div>
+                        <button type="submit" class="action-btn">Login</button>
+                    </form>
+                    <p class="form-switch">Don't have an account? <a href="#" id="show-register">Register</a></p>
+                </div>
+                
+                <!-- Register Form -->
+                <div id="register-form" class="auth-form" style="display: none;">
+                    <h2>Register</h2>
+                    <form id="register-form-element">
+                        <div class="form-group">
+                            <label for="register-username">Username</label>
+                            <input type="text" id="register-username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-email">Email</label>
+                            <input type="email" id="register-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password">Password</label>
+                            <input type="password" id="register-password" required minlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label for="register-address">Address</label>
+                            <textarea id="register-address" required></textarea>
+                        </div>
+                        <button type="submit" class="action-btn">Register</button>
+                    </form>
+                    <p class="form-switch">Already have an account? <a href="#" id="show-login">Login</a></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Detail Modal -->
+        <div id="product-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <div id="product-detail-content">
+                    <!-- Product details will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Add/Edit Product Modal -->
+        <div id="product-form-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2 id="product-form-title">Add New Product</h2>
+                <form id="product-form">
+                    <input type="hidden" id="product-id">
+                    <div class="form-group">
+                        <label for="product-name">Product Name</label>
+                        <input type="text" id="product-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-description">Description</label>
+                        <textarea id="product-description" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-price">Price ($)</label>
+                        <input type="number" id="product-price" min="0.01" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-stock">Stock Quantity</label>
+                        <input type="number" id="product-stock" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-category">Category</label>
+                        <select id="product-category" required>
+                            <!-- Categories will be loaded here -->
+                        </select>
+                    </div>
+                    <button type="submit" class="action-btn">Save Product</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Add/Edit Category Modal -->
+        <div id="category-form-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2 id="category-form-title">Add New Category</h2>
+                <form id="category-form">
+                    <input type="hidden" id="category-id">
+                    <div class="form-group">
+                        <label for="category-name">Category Name</label>
+                        <input type="text" id="category-name" required>
+                    </div>
+                    <button type="submit" class="action-btn">Save Category</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toast-container"></div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <h2>TechXpress</h2>
+                <p>Your one-stop shop for all your tech needs</p>
+            </div>
+            <div class="footer-links">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#" data-page="home">Home</a></li>
+                    <li><a href="#" data-page="products">Products</a></li>
+                    <li><a href="#" data-page="categories">Categories</a></li>
+                </ul>
+            </div>
+            <div class="footer-contact">
+                <h3>Contact Us</h3>
+                <p>Email: info@techxpress.com</p>
+                <p>Phone: (123) 456-7890</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 TechXpress. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

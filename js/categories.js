@@ -102,7 +102,7 @@ async function showEditCategoryForm(categoryId) {
         document.getElementById('category-id').value = category.categoryId;
         document.getElementById('category-name').value = category.name;
         
-        document.getElementById('category-form-modal').style.display = 'flex';
+        showModal('category-form-modal');
     } catch (error) {
         showToast('Error loading category details: ' + error.message, 'error');
     }
@@ -113,7 +113,7 @@ function showAddCategoryForm() {
     document.getElementById('category-id').value = '';
     document.getElementById('category-name').value = '';
     
-    document.getElementById('category-form-modal').style.display = 'flex';
+    showModal('category-form-modal');
 }
 
 async function handleCategorySubmit(e) {
@@ -151,7 +151,7 @@ async function handleCategorySubmit(e) {
         }
         
         // Close modal
-        document.getElementById('category-form-modal').style.display = 'none';
+    hideModal('category-form-modal');
         
         // Reload categories
         loadCategories();

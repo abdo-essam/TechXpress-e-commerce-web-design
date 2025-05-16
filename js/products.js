@@ -79,7 +79,7 @@ function createProductCard(product) {
     card.className = 'product-card';
     
     // Using a placeholder image
-    const imageSrc = 'https://via.placeholder.com/300';
+    const imageSrc = product.image || 'https://via.placeholder.com/300';
     
     card.innerHTML = `
         <img src="${imageSrc}" alt="${product.name}" class="product-image">
@@ -87,24 +87,43 @@ function createProductCard(product) {
             <h3 class="product-title">${product.name}</h3>
             <p class="product-price">$${product.price.toFixed(2)}</p>
             <div class="product-actions">
-                <button class="add-to-cart-btn" data-id="${product.productId}">Add to Cart</button>
-                <button class="view-details-btn" data-id="${product.productId}">Details</button>
+                <button class="add-to-cart-btn" data-id="${product.productId || product.id}">
+                    <i class="fas fa-cart-plus"></i> Add to Cart
+                </button>
+                <button class="view-details-btn" data-id="${product.productId || product.id}">
+                    <i class="fas fa-info-circle"></i> Details
+                </button>
             </div>
         </div>
     `;
     
-    // Add event listeners
-    card.querySelector('.add-to-cart-btn').addEventListener('click', function() {
-        addToCart(product.productId);
+    card.querySelector('.add-to-cart-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const productId = this.getAttribute('data-id');
+        
+        // Add animation to the card
+        card.classList.add('product-added-animation');
+        setTimeout(() => {
+            card.classList.remove('product-added-animation');
+        }, 600);
+        
+        // Call addToCart only once
+        addToCart(productId);
     });
     
-    card.querySelector('.view-details-btn').addEventListener('click', function() {
-        showProductDetails(product.productId);
+    // Add view details event listener
+    card.querySelector('.view-details-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const productId = this.getAttribute('data-id');
+        showProductDetails(productId);
     });
     
     return card;
 }
 
+// In products.js - update showProductDetails function
 async function showProductDetails(productId) {
     try {
         const response = await fetch(`${API_URL}/api/Product/${productId}`);
@@ -116,30 +135,116 @@ async function showProductDetails(productId) {
         const detailContent = document.getElementById('product-detail-content');
         
         // Using a placeholder image
-        const imageSrc = 'https://via.placeholder.com/500';
+        const imageSrc = product.image || 'https://via.placeholder.com/500';
         
         detailContent.innerHTML = `
             <div class="product-detail">
                 <img src="${imageSrc}" alt="${product.name}" class="product-detail-image">
                 <h2>${product.name}</h2>
                 <p class="product-detail-price">$${product.price.toFixed(2)}</p>
-                <p class="product-detail-description">${product.description}</p>
-                <p class="product-detail-stock">In Stock: ${product.stockQuantity}</p>
+                <p class="product-detail-description">${product.description || 'No description available'}</p>
+                <p class="product-detail-stock">In Stock: ${product.stockQuantity || 'Unknown'}</p>
                 <div class="product-detail-actions">
-                    <button class="action-btn add-to-cart-detail-btn" data-id="${product.productId}">Add to Cart</button>
+                    <div class="quantity-selector">
+                        <label for="detail-quantity">Quantity:</label>
+                        <div class="quantity-control detail-quantity-control">
+                            <button class="quantity-btn detail-decrease-btn">-</button>
+                            <input type="number" id="detail-quantity" class="quantity-input" value="1" min="1" max="${product.stockQuantity || 99}">
+                            <button class="quantity-btn detail-increase-btn">+</button>
+                        </div>
+                    </div>
+                    <button class="action-btn add-to-cart-detail-btn" data-id="${product.productId}">
+                        <i class="fas fa-cart-plus"></i> Add to Cart
+                    </button>
                 </div>
             </div>
         `;
         
-        // Add event listener
-        document.querySelector('.add-to-cart-detail-btn').addEventListener('click', function() {
-            addToCart(product.productId);
+        // Setup quantity control
+        const quantityInput = detailContent.querySelector('#detail-quantity');
+        const decreaseBtn = detailContent.querySelector('.detail-decrease-btn');
+        const increaseBtn = detailContent.querySelector('.detail-increase-btn');
+        
+        decreaseBtn.addEventListener('click', function() {
+            const currentVal = parseInt(quantityInput.value);
+            if (currentVal > 1) {
+                quantityInput.value = currentVal - 1;
+            }
+        });
+        
+        increaseBtn.addEventListener('click', function() {
+            const currentVal = parseInt(quantityInput.value);
+            const max = parseInt(quantityInput.max);
+            if (currentVal < max) {
+                quantityInput.value = currentVal + 1;
+            }
+        });
+        
+        // Add to cart event listener
+        detailContent.querySelector('.add-to-cart-detail-btn').addEventListener('click', function() {
+            const quantity = parseInt(quantityInput.value);
+            addToCart(product.productId, quantity);
+        });
+        
+        // Show modal
+        showModal('product-modal');
+    } catch (error) {
+        console.error('Error loading product details:', error);
+        showToast('Error loading product details: ' + error.message, 'error');
+        
+        // Show a fallback UI for development/testing
+        const detailContent = document.getElementById('product-detail-content');
+        detailContent.innerHTML = `
+            <div class="product-detail">
+                <img src="https://via.placeholder.com/500" alt="Product" class="product-detail-image">
+                <h2>Product #${productId}</h2>
+                <p class="product-detail-price">$99.99</p>
+                <p class="product-detail-description">Mock product description for development.</p>
+                <p class="product-detail-stock">In Stock: 10</p>
+                <div class="product-detail-actions">
+                    <div class="quantity-selector">
+                        <label for="detail-quantity">Quantity:</label>
+                        <div class="quantity-control detail-quantity-control">
+                            <button class="quantity-btn detail-decrease-btn">-</button>
+                            <input type="number" id="detail-quantity" class="quantity-input" value="1" min="1" max="10">
+                            <button class="quantity-btn detail-increase-btn">+</button>
+                        </div>
+                    </div>
+                    <button class="action-btn add-to-cart-detail-btn" data-id="${productId}">
+                        <i class="fas fa-cart-plus"></i> Add to Cart
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Setup quantity control for fallback UI
+        const quantityInput = detailContent.querySelector('#detail-quantity');
+        const decreaseBtn = detailContent.querySelector('.detail-decrease-btn');
+        const increaseBtn = detailContent.querySelector('.detail-increase-btn');
+        
+        decreaseBtn.addEventListener('click', function() {
+            const currentVal = parseInt(quantityInput.value);
+            if (currentVal > 1) {
+                quantityInput.value = currentVal - 1;
+            }
+        });
+        
+        increaseBtn.addEventListener('click', function() {
+            const currentVal = parseInt(quantityInput.value);
+            const max = parseInt(quantityInput.max);
+            if (currentVal < max) {
+                quantityInput.value = currentVal + 1;
+            }
+        });
+        
+        // Add to cart event listener for fallback UI
+        detailContent.querySelector('.add-to-cart-detail-btn').addEventListener('click', function() {
+            const quantity = parseInt(quantityInput.value);
+            addToCart(productId, quantity);
         });
         
         // Show modal
         document.getElementById('product-modal').style.display = 'flex';
-    } catch (error) {
-        showToast('Error loading product details: ' + error.message, 'error');
     }
 }
 
@@ -157,7 +262,7 @@ function showAddProductForm() {
     document.getElementById('product-price').value = '';
     document.getElementById('product-stock').value = '';
     
-    document.getElementById('product-form-modal').style.display = 'flex';
+    showModal('product-form-modal');
 }
 
 async function showEditProductForm(productId) {
@@ -177,7 +282,7 @@ async function showEditProductForm(productId) {
         document.getElementById('product-stock').value = product.stockQuantity;
         document.getElementById('product-category').value = product.categoryId;
         
-        document.getElementById('product-form-modal').style.display = 'flex';
+        showModal('product-form-modal');
     } catch (error) {
         showToast('Error loading product details: ' + error.message, 'error');
     }
@@ -228,7 +333,7 @@ async function handleProductSubmit(e) {
         }
         
         // Close modal
-        document.getElementById('product-form-modal').style.display = 'none';
+    hideModal('product-form-modal');
         
         // Reload products
         loadAllProducts();

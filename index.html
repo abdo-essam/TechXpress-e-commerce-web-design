@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,8 +8,9 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
-     <div class="container">
+    <div class="container">
         <header>
             <div class="logo">
                 <h1>TechXpress</h1>
@@ -48,7 +50,7 @@
                         <button class="shop-now-btn" data-page="products">Shop Now</button>
                     </div>
                 </div>
-                
+
                 <div class="featured-products">
                     <h2>Featured Products</h2>
                     <div id="featured-products-grid" class="products-grid">
@@ -89,7 +91,8 @@
                 </div>
             </section>
 
-            <!-- Cart Page -->
+            <!-- Inside the cart page section -->
+            <!-- Make sure you have this in your cart section in index.html -->
             <section id="cart" class="page">
                 <h2>Your Shopping Cart</h2>
                 <div id="cart-items">
@@ -102,6 +105,7 @@
                         <span id="cart-subtotal">$0.00</span>
                     </div>
                     <button id="checkout-btn" class="action-btn" disabled>Proceed to Checkout</button>
+                    <button id="clear-cart-btn" class="clear-cart-btn">Clear Cart</button>
                 </div>
             </section>
         </main>
@@ -110,7 +114,7 @@
         <div id="auth-modal" class="modal">
             <div class="modal-content">
                 <span class="close-modal">&times;</span>
-                
+
                 <!-- Login Form -->
                 <div id="login-form" class="auth-form">
                     <h2>Login</h2>
@@ -127,7 +131,7 @@
                     </form>
                     <p class="form-switch">Don't have an account? <a href="#" id="show-register">Register</a></p>
                 </div>
-                
+
                 <!-- Register Form -->
                 <div id="register-form" class="auth-form" style="display: none;">
                     <h2>Register</h2>
@@ -243,7 +247,7 @@
             <p>&copy; 2025 TechXpress. All rights reserved.</p>
         </div>
     </footer>
-    
+
     <!-- Updated script tags at the bottom -->
     <script src="js/utils.js"></script>
     <script src="js/auth.js"></script>
@@ -253,4 +257,5 @@
     <script src="js/cart.js"></script>
     <script src="js/main.js"></script>
 </body>
+
 </html>

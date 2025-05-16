@@ -7,15 +7,17 @@ let jwtToken = null;
 function showLoginForm() {
     document.getElementById('login-form').style.display = 'block';
     document.getElementById('register-form').style.display = 'none';
-    document.getElementById('auth-modal').style.display = 'flex';
+    showModal('auth-modal');
 }
 
 function showRegisterForm() {
     document.getElementById('login-form').style.display = 'none';
     document.getElementById('register-form').style.display = 'block';
-    document.getElementById('auth-modal').style.display = 'flex';
+    showModal('auth-modal');
 }
 
+
+// auth.js - Updated login function
 async function handleLogin(e) {
     e.preventDefault();
     
@@ -23,6 +25,8 @@ async function handleLogin(e) {
     const password = document.getElementById('login-password').value;
     
     try {
+        console.log('Attempting login with:', { email });
+        
         const response = await fetch(`${API_URL}/api/Auth/Login`, {
             method: 'POST',
             headers: {
@@ -31,20 +35,23 @@ async function handleLogin(e) {
             body: JSON.stringify({ email, password })
         });
         
-        if (!response.ok) {
-            throw new Error('Login failed');
-        }
+        console.log('Login response status:', response.status);
         
         const data = await response.json();
+        console.log('Login response data:', data);
+        
+        if (!response.ok) {
+            throw new Error(data.message || 'Login failed. Please check your credentials.');
+        }
         
         // Save auth data
         jwtToken = data.token;
         currentUser = {
-            username: data.username,
-            email: data.email,
-            role: data.role
+            username: data.username || email.split('@')[0], // Fallback if username is not provided
+            email: data.email || email,
+            role: data.role || 'User'
         };
-        userRole = data.role;
+        userRole = currentUser.role;
         
         localStorage.setItem('jwtToken', jwtToken);
         localStorage.setItem('userData', JSON.stringify(currentUser));
@@ -53,12 +60,13 @@ async function handleLogin(e) {
         updateUIForLoggedInUser();
         
         // Close modal and show success
-        document.getElementById('auth-modal').style.display = 'none';
+    hideModal('auth-modal');
         showToast('Logged in successfully', 'success');
         
         // Reset form
         document.getElementById('login-form-element').reset();
     } catch (error) {
+        console.error('Login error:', error);
         showToast('Login failed: ' + error.message, 'error');
     }
 }
@@ -72,6 +80,8 @@ async function handleRegister(e) {
     const address = document.getElementById('register-address').value;
     
     try {
+        console.log('Attempting registration with:', { username, email });
+        
         const response = await fetch(`${API_URL}/api/Auth/Register`, {
             method: 'POST',
             headers: {
@@ -85,8 +95,19 @@ async function handleRegister(e) {
             })
         });
         
+        console.log('Registration response status:', response.status);
+        
+        // Always try to parse the response, even if status is not OK
+        let data;
+        try {
+            data = await response.json();
+            console.log('Registration response data:', data);
+        } catch (err) {
+            console.log('Could not parse response as JSON');
+        }
+        
         if (!response.ok) {
-            throw new Error('Registration failed');
+            throw new Error(data?.message || 'Registration failed. Please try again later.');
         }
         
         // Show success and switch to login
@@ -96,6 +117,7 @@ async function handleRegister(e) {
         // Reset form
         document.getElementById('register-form-element').reset();
     } catch (error) {
+        console.error('Registration error:', error);
         showToast('Registration failed: ' + error.message, 'error');
     }
 }

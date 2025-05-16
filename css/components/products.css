@@ -132,3 +132,13 @@
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     }
 }
+
+@keyframes productAddedPulse {
+    0% { transform: translateY(0) scale(1); box-shadow: var(--shadow); }
+    50% { transform: translateY(-10px) scale(1.02); box-shadow: 0 15px 20px rgba(0, 0, 0, 0.2); }
+    100% { transform: translateY(0) scale(1); box-shadow: var(--shadow); }
+}
+
+.product-added-animation {
+    animation: productAddedPulse 0.6s ease-in-out;
+}
